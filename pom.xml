@@ -14,7 +14,7 @@
   <packaging>hpi</packaging>
   <name>AWS Global Configuration Plugin</name>
   <description>Configure all AWS related plugins from a single page</description>
-  <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+  <url>https://github.com/CrimsonCustomJenkins/${project.artifactId}-plugin</url>
 
   <licenses>
     <license>
@@ -24,10 +24,10 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:https://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
+    <connection>scm:git:https://github.com/CrimsonCustomJenkins/${project.artifactId}-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:CrimsonCustomJenkins/${project.artifactId}-plugin.git</developerConnection>
     <tag>${scmTag}</tag>
-    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <url>https://github.com/CrimsonCustomJenkins/${project.artifactId}-plugin</url>
   </scm>
 
   <properties>

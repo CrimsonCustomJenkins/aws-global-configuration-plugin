@@ -32,6 +32,7 @@ import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import hudson.util.FormValidation;
 import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlInput;
 import org.htmlunit.html.HtmlSelect;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class CredentialsAwsGlobalConfigurationTest {
     }
 
     @Test
-    public void uiAndStorage() {
+    public void uiAndStorage_1() {
         rr.then(r -> {
             assertNull(
                     "not set initially", CredentialsAwsGlobalConfiguration.get().getRegion());
@@ -79,6 +80,40 @@ public class CredentialsAwsGlobalConfigurationTest {
                     "still there after restart of Jenkins",
                     Region.SA_EAST_1.id(),
                     CredentialsAwsGlobalConfiguration.get().getRegion());
+        });
+    }
+
+    @Test
+    public void uiAndStorage_2() {
+        rr.then(r -> {
+            assertNull(
+                    "initially no custom region",
+                    CredentialsAwsGlobalConfiguration.get().getCustomRegion());
+
+            JenkinsRule.WebClient wc = r.createWebClient();
+            HtmlForm config = wc.goTo("aws").getFormByName("config");
+            r.submit(config);
+            assertNull("reset to null", CredentialsAwsGlobalConfiguration.get().getCustomRegion());
+
+            config = wc.goTo("aws").getFormByName("config");
+
+            HtmlInput input = config.getInputByName("_.customRegion");
+            input.setValue("home");
+            HtmlSelect select = config.getSelectByName("_.region");
+            select.setSelectedAttribute(Region.EU_WEST_1.id(), true);
+
+            r.submit(config);
+
+            assertEquals(
+                    CredentialsAwsGlobalConfiguration.get().getCustomRegion(),
+                    CredentialsAwsGlobalConfiguration.get().getRegion());
+            assertEquals("home", CredentialsAwsGlobalConfiguration.get().getRegion());
+        });
+        rr.then(r -> {
+            assertEquals("home", CredentialsAwsGlobalConfiguration.get().getRegion());
+            assertEquals(
+                    Region.EU_WEST_1.id(),
+                    CredentialsAwsGlobalConfiguration.get().getRegion(true));
         });
     }
 

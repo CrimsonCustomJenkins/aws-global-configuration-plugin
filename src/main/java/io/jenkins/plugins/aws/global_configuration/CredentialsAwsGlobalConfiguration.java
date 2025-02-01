@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
@@ -82,6 +83,8 @@ public final class CredentialsAwsGlobalConfiguration extends AbstractAwsGlobalCo
      */
     private String region;
 
+    private String customRegion;
+
     /**
      * AWS credentials to access to the S3 Bucket, if it is empty, it would use the IAM instance profile from the
      * jenkins hosts.
@@ -99,13 +102,34 @@ public final class CredentialsAwsGlobalConfiguration extends AbstractAwsGlobalCo
     protected CredentialsAwsGlobalConfiguration(boolean test) {}
 
     public String getRegion() {
+        if (StringUtils.isNotBlank(getCustomRegion())) {
+            return getCustomRegion();
+        }
         return region;
+    }
+
+    public String getRegion(boolean noReplace) {
+        if (noReplace) {
+            return region;
+        }
+        return getRegion();
     }
 
     @DataBoundSetter
     public void setRegion(String region) {
         this.region = Util.fixEmpty(region);
         checkValue(doCheckRegion(region));
+        save();
+    }
+
+    public String getCustomRegion() {
+        return customRegion;
+    }
+
+    @DataBoundSetter
+    public void setCustomRegion(String customRegion) {
+        this.customRegion = Util.fixEmpty(customRegion);
+        checkValue(doCheckCustomRegion(customRegion));
         save();
     }
 
@@ -282,9 +306,23 @@ public final class CredentialsAwsGlobalConfiguration extends AbstractAwsGlobalCo
     }
 
     public FormValidation doCheckRegion(@QueryParameter String region) {
+        if (StringUtils.isNotBlank(getCustomRegion())) {
+            return FormValidation.ok();
+        }
         if (StringUtils.isNotBlank(region)) {
             if (Region.regions().stream().noneMatch(r -> r.id().equals(region))) {
                 return FormValidation.error("Region is not valid");
+            }
+        }
+        return FormValidation.ok();
+    }
+
+    public FormValidation doCheckCustomRegion(@QueryParameter String customRegion) {
+        if (StringUtils.isNotBlank(customRegion)) {
+            if (!Pattern.compile("^[a-z0-9]+(-[a-z0-9]+)*$")
+                    .matcher(customRegion)
+                    .matches()) {
+                return FormValidation.error("Custom region is not valid");
             }
         }
         return FormValidation.ok();

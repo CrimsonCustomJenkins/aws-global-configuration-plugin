@@ -5,6 +5,9 @@
         <f:entry title="${%Region}" field="region">
             <f:select/>
         </f:entry>
+        <f:entry title="${%Custom Region}" field="customRegion">
+            <f:textbox/>
+        </f:entry>
         <f:entry title="${%Amazon Credentials}" field="credentialsId">
             <c:select />
         </f:entry>
